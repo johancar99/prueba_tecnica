@@ -1,0 +1,30 @@
+# Variables de entorno — excluir los reales, versionar solo los de ejemplo
+.env
+backend/.env
+frontend/.env
+.env.local
+.env.production
+backend/.env.local
+frontend/.env.local
+
+# Dependencias (residen en volúmenes Docker o se instalan localmente)
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Builds
+backend/dist/
+frontend/.next/
+frontend/out/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+*.swp

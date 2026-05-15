@@ -1,0 +1,44 @@
+---
+alwaysApply: true
+---
+
+# Reglas de Arquitectura y Desarrollo - Backend (NestJS + Prisma)
+
+Eres un experto en NestJS, TypeScript y Arquitectura Limpia. Tu objetivo es construir un sistema de prescripciones médicas siguiendo estos lineamientos estrictos:
+
+### 1. Estructura y Modularidad
+- [cite_start]**Arquitectura Modular:** Cada dominio (Auth, Users, Patients, Doctors, Prescriptions) debe estar en su propio módulo [cite: 257-273].
+- **Separación de Capas:** - **Controllers:** Manejan únicamente la entrada/salida HTTP.
+  - **Services:** Contienen la lógica de negocio pura. No acceden directamente a `req` o `res`.
+  - [cite_start]**DTOs:** Obligatorios para entrada de datos; usa `class-validator` y `class-transformer`[cite: 41, 340].
+  - **Entities:** Define clases para la salida de datos si es necesario serializar.
+
+### 2. Seguridad y Acceso (RBAC)
+- [cite_start]**Autenticación:** Implementar JWT con Access Token (TTL 15m) y Refresh Token (TTL 7d) [cite: 36, 246-247].
+- [cite_start]**Roles:** Usa el Enum de Prisma (`ADMIN`, `DOCTOR`, `PATIENT`) [cite: 64-68].
+- [cite_start]**Protección de Rutas:** Todas las rutas (excepto login/register) deben estar protegidas por un `JwtAuthGuard` y, cuando corresponda, un `RolesGuard` usando un decorador personalizado `@Roles()` [cite: 38-39].
+- [cite_start]**Reglas de Negocio de Acceso:** - Los Médicos solo gestionan sus propias prescripciones[cite: 200].
+  - [cite_start]Los Pacientes solo ven sus propias prescripciones[cite: 200].
+  - [cite_start]Los Admins tienen acceso total[cite: 201].
+
+### 3. Lógica de Dominio Específica
+- [cite_start]**Prescripciones:** - No hay catálogo de productos; los ítems se crean mediante texto libre (inputs manuales)[cite: 9, 353].
+  - [cite_start]Cada prescripción debe generar un código único (`code`) para el código QR [cite: 101-103].
+  - [cite_start]El estado inicial es siempre `pending`[cite: 32].
+- [cite_start]**Generación de PDF:** Implementar un servicio dedicado para generar PDFs que incluyan: datos del médico, paciente, ítems y el código/QR [cite: 226-228].
+
+### 4. Base de Datos y Persistencia
+- **Prisma:** Usa el `PrismaService` inyectado para todas las operaciones.
+- [cite_start]**Relaciones:** Respeta estrictamente el modelo relacional definido: `User -> Doctor/Patient -> Prescription -> Items` [cite: 58-135].
+- [cite_start]**Rendimiento:** Asegúrate de incluir índices en campos de búsqueda frecuentes como `status`, `createdAt`, `patientId` y `authorId` [cite: 147-148].
+- [cite_start]**Seed:** El script `prisma/seed.ts` debe crear las cuentas de prueba por defecto [cite: 232-238].
+
+### 5. Estándares de Código y Errores
+- **Nombramiento:** - Variables y funciones: `camelCase`.
+  - Clases y DTOs: `PascalCase`.
+  - Archivos: `kebab-case.ext`.
+- **Manejo de Errores:** Usa un `HttpExceptionFilter` global. [cite_start]Las respuestas de error deben ser consistentes: `{ message, statusCode, error }`[cite: 41, 202].
+- [cite_start]**Paginación:** Todos los endpoints de listado (`GET`) deben soportar `page` y `limit`, con ordenamiento por defecto `createdAt DESC` [cite: 48-49].
+
+### 6. Calidad y Testing
+- [cite_start]**Tests:** Escribe tests unitarios para los servicios críticos (especialmente la lógica de creación de prescripciones y cálculo de métricas para el Admin) usando Jest [cite: 53-54].

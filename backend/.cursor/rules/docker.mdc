@@ -1,0 +1,54 @@
+---
+description: Infraestructura Docker del proyecto — contenedores, puertos y comandos de gestión
+alwaysApply: true
+---
+
+# Infraestructura Docker
+
+## Contenedores activos
+
+| Nombre | Imagen | Puerto | Descripción |
+|--------|--------|--------|-------------|
+| `prueba_tecnica-backend-1` | `prueba_tecnica-backend` | `3001` | API NestJS + Prisma |
+| `prueba_tecnica-frontend-1` | `prueba_tecnica-frontend` | `3000` | Frontend Next.js |
+| `prueba_tecnica-db-1` | `postgres:16-alpine` | `5432` | Base de datos PostgreSQL |
+
+## Red interna
+
+- Los servicios se comunican por nombre de contenedor: `backend → db` (host: `"db"`), `frontend → backend` (host: `"backend"`).
+- El `DATABASE_URL` del backend usa `@db:5432`.
+
+## Comandos frecuentes
+
+```bash
+# Ver estado
+docker ps
+
+# Logs del backend
+docker logs prueba_tecnica-backend-1 -f
+
+# Ejecutar comando dentro del backend
+docker exec prueba_tecnica-backend-1 <cmd>
+
+# Instalar un paquete npm en el backend
+docker exec prueba_tecnica-backend-1 npm install <paquete>
+
+# Reiniciar solo el backend (sin rebuild)
+docker restart prueba_tecnica-backend-1
+
+# Rebuild completo del backend (aplica cambios de Dockerfile o docker-compose)
+cd /home/jwarl/projects/node/prueba_tecnica && docker compose up -d --no-deps --build backend
+
+# Ejecutar migraciones manualmente
+docker exec prueba_tecnica-backend-1 npx prisma migrate dev --name <nombre>
+
+# Ver tablas en la BD
+docker exec prueba_tecnica-db-1 psql -U postgres -d prueba_tecnica_db -c "\dt"
+```
+
+## Notas importantes
+
+- `npm install` NO está disponible directamente en el host WSL para este proyecto; usa `docker exec` para instalar paquetes.
+- El volumen `./backend:/app` sincroniza el código en tiempo real; NestJS (`start:dev`) recarga automáticamente cambios en `src/`.
+- Si instalas un nuevo paquete npm, reinicia el contenedor para que el watcher lo reconozca: `docker restart prueba_tecnica-backend-1`.
+- El comando de arranque del backend es: `npm install && npx prisma generate && npx prisma migrate deploy && npx prisma db seed && npm run start:dev`.

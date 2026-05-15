@@ -1,0 +1,117 @@
+// =============================================================================
+// Prisma Schema — Sistema de Prescripciones Médicas
+// Provider: PostgreSQL
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  ADMIN
+  DOCTOR
+  PATIENT
+}
+
+enum PrescriptionStatus {
+  pending
+  completed
+  cancelled
+  consumed
+}
+
+// ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  name         String
+  role         Role     @default(PATIENT)
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  doctor  Doctor?
+  patient Patient?
+
+  @@index([email])
+  @@map("users")
+}
+
+model Doctor {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  licenseNumber String   @unique
+  specialty     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prescriptions Prescription[]
+
+  @@map("doctors")
+}
+
+model Patient {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  birthDate DateTime?
+  phone     String?
+  address   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prescriptions Prescription[]
+
+  @@map("patients")
+}
+
+model Prescription {
+  id         String             @id @default(cuid())
+  code       String             @unique
+  status     PrescriptionStatus @default(pending)
+  notes      String?
+  consumedAt DateTime?
+  authorId   String
+  patientId  String
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  author  Doctor             @relation(fields: [authorId], references: [id])
+  patient Patient            @relation(fields: [patientId], references: [id])
+  items   PrescriptionItem[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([patientId])
+  @@index([authorId])
+  @@map("prescriptions")
+}
+
+model PrescriptionItem {
+  id             String   @id @default(cuid())
+  prescriptionId String
+  medication     String
+  dosage         String
+  frequency      String
+  duration       String
+  instructions   String?
+  createdAt      DateTime @default(now())
+
+  prescription Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+
+  @@map("prescription_items")
+}
