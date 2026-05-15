@@ -105,7 +105,7 @@ export default function DoctorPrescriptionsPage() {
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Mis Prescripciones</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {meta
               ? `${meta.total} prescripción${meta.total !== 1 ? "es" : ""}`
               : "Cargando..."}
@@ -128,10 +128,10 @@ export default function DoctorPrescriptionsPage() {
           <select
             value={currentStatus}
             onChange={(e) => pushParams({ status: e.target.value })}
-            className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
           >
             {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-slate-800">
+              <option key={opt.value} value={opt.value} className="bg-white dark:bg-slate-800">
                 {opt.label}
               </option>
             ))}
@@ -146,7 +146,7 @@ export default function DoctorPrescriptionsPage() {
             type="date"
             value={currentFrom}
             onChange={(e) => pushParams({ from: e.target.value })}
-            className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 [color-scheme:dark]"
+            className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 [color-scheme:light] dark:[color-scheme:dark]"
           />
         </div>
 
@@ -158,14 +158,14 @@ export default function DoctorPrescriptionsPage() {
             type="date"
             value={currentTo}
             onChange={(e) => pushParams({ to: e.target.value })}
-            className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 [color-scheme:dark]"
+            className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 [color-scheme:light] dark:[color-scheme:dark]"
           />
         </div>
 
         {hasFilters && (
           <button
             onClick={() => router.push("/doctor/prescriptions")}
-            className="self-end rounded-lg border border-slate-700 px-3 py-2.5 text-sm text-slate-400 transition-colors hover:border-slate-400 dark:hover:border-slate-600 hover:text-slate-200"
+            className="self-end rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-500 transition-colors hover:border-slate-400 hover:text-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
           >
             Limpiar filtros
           </button>
@@ -262,7 +262,7 @@ function PrescriptionRow({ prescription: rx }: { prescription: Prescription }) {
 
       <td className="px-4 py-3">
         <Link href={`/doctor/prescriptions/${rx.id}`}>
-          <button className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-indigo-500/50 hover:bg-indigo-500/10 hover:text-indigo-400">
+          <button className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 transition-colors hover:border-indigo-500/50 hover:bg-indigo-500/10 hover:text-indigo-400">
             <EyeIcon />
             Ver detalle
           </button>
@@ -339,6 +339,11 @@ function EyeIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+      />
+    </svg>
+  );
+}
+.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
       />
     </svg>
   );

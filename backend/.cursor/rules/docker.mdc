@@ -36,7 +36,7 @@ docker exec prueba_tecnica-backend-1 npm install <paquete>
 # Reiniciar solo el backend (sin rebuild)
 docker restart prueba_tecnica-backend-1
 
-# Rebuild completo del backend (aplica cambios de Dockerfile o docker-compose)
+# Rebuild completo del backend (aplica cambios de Dockerfile.dev o docker-compose)
 cd /home/jwarl/projects/node/prueba_tecnica && docker compose up -d --no-deps --build backend
 
 # Ejecutar migraciones manualmente

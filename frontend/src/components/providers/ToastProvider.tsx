@@ -8,11 +8,8 @@ export default function ToastProvider() {
       position="top-right"
       toastOptions={{
         duration: 4000,
-        style: {
-          background: "#1e293b",
-          color: "#f1f5f9",
-          border: "1px solid #334155",
-        },
+        className:
+          "!bg-white !text-slate-900 !border-slate-200 dark:!bg-slate-800 dark:!text-slate-100 dark:!border-slate-700",
       }}
     />
   );

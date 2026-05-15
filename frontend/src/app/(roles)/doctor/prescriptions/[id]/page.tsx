@@ -208,7 +208,7 @@ export default function DoctorPrescriptionDetailPage() {
               {prescription.patient.user.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="font-medium text-slate-100">
+              <p className="font-medium text-slate-900 dark:text-slate-100">
                 {prescription.patient.user.name}
               </p>
               <p className="text-sm text-slate-400">
@@ -233,7 +233,7 @@ export default function DoctorPrescriptionDetailPage() {
               {prescription.author.user.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="font-medium text-slate-100">
+              <p className="font-medium text-slate-900 dark:text-slate-100">
                 {prescription.author.user.name}
               </p>
               <p className="text-sm text-slate-400">
@@ -251,8 +251,8 @@ export default function DoctorPrescriptionDetailPage() {
 
       {/* Medications */}
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-        <div className="border-b border-slate-800 px-5 py-4 md:px-6">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+        <div className="border-b border-slate-200 dark:border-slate-800 px-5 py-4 md:px-6">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-100">
             Medicamentos
             <span className="ml-2 rounded-full bg-indigo-600/20 px-2 py-0.5 text-xs font-semibold text-indigo-400">
               {prescription.items.length}
@@ -307,7 +307,7 @@ export default function DoctorPrescriptionDetailPage() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
             Notas y observaciones
           </h2>
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-300">
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-slate-300">
             {prescription.notes}
           </p>
         </section>

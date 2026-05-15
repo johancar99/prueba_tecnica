@@ -168,7 +168,7 @@ export default function NewPrescriptionPage() {
           </button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Nueva Prescripción</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-slate-100">Nueva Prescripción</h1>
           <p className="mt-0.5 text-sm text-slate-400">
             Completa los datos del paciente y los medicamentos a prescribir
           </p>
@@ -182,7 +182,7 @@ export default function NewPrescriptionPage() {
       >
         {/* ── Patient section ─────────────────────────────────────────────── */}
         <section className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 md:p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-100">
             <PatientIcon />
             Datos del Paciente
           </h2>
@@ -212,7 +212,7 @@ export default function NewPrescriptionPage() {
                     <button
                       type="button"
                       onClick={handleClearPatient}
-                      className="ml-3 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-800 hover:text-red-400"
+                      className="ml-3 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red dark:hover:bg-slate-800-400"
                       aria-label="Cambiar paciente"
                     >
                       <XIcon />
@@ -249,7 +249,7 @@ export default function NewPrescriptionPage() {
 
                     {/* Dropdown results */}
                     {showDropdown && (
-                      <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-slate-700 bg-slate-900 shadow-2xl">
+                      <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 shadow-2xl">
                         {patientResults.length === 0 ? (
                           <p className="px-4 py-3 text-sm text-slate-500">
                             Sin resultados para &ldquo;{searchQuery}&rdquo;
@@ -261,7 +261,7 @@ export default function NewPrescriptionPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleSelectPatient(p)}
-                                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-slate-800"
+                                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
                                 >
                                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-600/20 text-xs font-semibold text-sky-400">
                                     {p.user.name.charAt(0).toUpperCase()}
@@ -298,7 +298,7 @@ export default function NewPrescriptionPage() {
         {/* ── Items section ───────────────────────────────────────────────── */}
         <section className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 md:p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+            <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-100">
               <PillIcon />
               Medicamentos
               <span className="ml-1 rounded-full bg-indigo-600/20 px-2 py-0.5 text-xs font-semibold text-indigo-400">
@@ -333,7 +333,7 @@ export default function NewPrescriptionPage() {
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="relative rounded-lg border border-slate-700/60 bg-slate-800/30 p-4"
+                className="relative rounded-lg border border-slate-300 dark:border-slate-700/60 bg-slate-800/30 p-4"
               >
                 {/* Item header */}
                 <div className="mb-3 flex items-center justify-between">
@@ -390,14 +390,14 @@ export default function NewPrescriptionPage() {
 
                 {/* Row 3: instructions */}
                 <div className="mt-3">
-                  <label className="mb-1.5 block text-sm font-medium text-slate-300">
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
                     Instrucciones adicionales
                   </label>
                   <input
                     type="text"
                     placeholder="ej. Tomar con alimentos"
                     disabled={isSubmitting}
-                    className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none transition-colors hover:border-slate-400 dark:hover:border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-500 outline-none transition-colors hover:border-slate-400 dark:hover:border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
                     {...register(`items.${index}.instructions`)}
                   />
                 </div>
@@ -418,19 +418,19 @@ export default function NewPrescriptionPage() {
 
         {/* ── Notes section ───────────────────────────────────────────────── */}
         <section className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 md:p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-100">
             <NotesIcon />
             Notas y Observaciones
           </h2>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-300">
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Observaciones clínicas
             </label>
             <textarea
               rows={4}
               placeholder="Notas adicionales sobre el tratamiento, alergias conocidas, advertencias, etc."
               disabled={isSubmitting}
-              className="w-full resize-none rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none transition-colors hover:border-slate-400 dark:hover:border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full resize-none rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-500 outline-none transition-colors hover:border-slate-400 dark:hover:border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
               {...register("notes")}
             />
           </div>

@@ -257,7 +257,7 @@ export default function PatientPrescriptionDetailPage() {
               {prescription.author.user.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="font-medium text-slate-100">
+              <p className="font-medium text-slate-900 dark:text-slate-100">
                 Dr/a. {prescription.author.user.name}
               </p>
               <p className="text-sm text-slate-400">
@@ -282,7 +282,7 @@ export default function PatientPrescriptionDetailPage() {
               {prescription.patient.user.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="font-medium text-slate-100">
+              <p className="font-medium text-slate-900 dark:text-slate-100">
                 {prescription.patient.user.name}
               </p>
               <p className="text-sm text-slate-400">
@@ -300,8 +300,8 @@ export default function PatientPrescriptionDetailPage() {
 
       {/* Medications — card list on mobile, table on desktop */}
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-5 py-4">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-100">
             Medicamentos
             <span className="ml-2 rounded-full bg-indigo-600/20 px-2 py-0.5 text-xs font-semibold text-indigo-400">
               {prescription.items.length}
@@ -355,24 +355,24 @@ export default function PatientPrescriptionDetailPage() {
         <div className="flex flex-col divide-y divide-slate-800 md:hidden">
           {prescription.items.map((item) => (
             <div key={item.id} className="flex flex-col gap-3 p-4">
-              <p className="font-semibold text-slate-100">{item.medication}</p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{item.medication}</p>
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 <div>
                   <dt className="text-xs text-slate-500">Dosis</dt>
-                  <dd className="text-slate-300">{item.dosage}</dd>
+                  <dd className="text-slate-700 dark:text-slate-300">{item.dosage}</dd>
                 </div>
                 <div>
                   <dt className="text-xs text-slate-500">Frecuencia</dt>
-                  <dd className="text-slate-300">{item.frequency}</dd>
+                  <dd className="text-slate-700 dark:text-slate-300">{item.frequency}</dd>
                 </div>
                 <div>
                   <dt className="text-xs text-slate-500">Duración</dt>
-                  <dd className="text-slate-300">{item.duration}</dd>
+                  <dd className="text-slate-700 dark:text-slate-300">{item.duration}</dd>
                 </div>
                 {item.instructions && (
                   <div className="col-span-2">
                     <dt className="text-xs text-slate-500">Instrucciones</dt>
-                    <dd className="text-slate-300">{item.instructions}</dd>
+                    <dd className="text-slate-700 dark:text-slate-300">{item.instructions}</dd>
                   </div>
                 )}
               </dl>
@@ -387,7 +387,7 @@ export default function PatientPrescriptionDetailPage() {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
             Notas del médico
           </h2>
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-300">
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-slate-300">
             {prescription.notes}
           </p>
         </section>

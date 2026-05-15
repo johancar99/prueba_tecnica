@@ -18,6 +18,7 @@ import {
 } from "recharts";
 import { fetcher, ApiError } from "@/lib/fetcher";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useChartTheme } from "@/hooks/useChartTheme";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,6 +79,7 @@ export default function AdminDashboardPage() {
 
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const chart = useChartTheme();
 
   const fetchMetrics = useCallback(
     async (from: string, to: string) => {
@@ -131,7 +133,7 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Dashboard</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Resumen general del sistema
           </p>
         </div>
@@ -146,7 +148,7 @@ export default function AdminDashboardPage() {
               type="date"
               value={currentFrom}
               onChange={(e) => pushParams({ from: e.target.value })}
-              className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 [color-scheme:dark]"
+              className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 [color-scheme:light] dark:[color-scheme:dark]"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -157,13 +159,13 @@ export default function AdminDashboardPage() {
               type="date"
               value={currentTo}
               onChange={(e) => pushParams({ to: e.target.value })}
-              className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 [color-scheme:dark]"
+              className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 [color-scheme:light] dark:[color-scheme:dark]"
             />
           </div>
           {hasFilters && (
             <button
               onClick={() => router.push("/admin")}
-              className="self-end rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-400 transition-colors hover:border-slate-400 dark:hover:border-slate-600 hover:text-slate-200"
+              className="self-end rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-500 transition-colors hover:border-slate-400 hover:text-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
             >
               Limpiar
             </button>
@@ -214,28 +216,23 @@ export default function AdminDashboardPage() {
                   data={metrics.byDay}
                   margin={{ top: 4, right: 8, left: -20, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
                   <XAxis
                     dataKey="date"
                     tickFormatter={formatShortDate}
-                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    tick={{ fill: chart.tick, fontSize: 11 }}
                     tickLine={false}
-                    axisLine={{ stroke: "#1e293b" }}
+                    axisLine={{ stroke: chart.axis }}
                     interval="preserveStartEnd"
                   />
                   <YAxis
-                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    tick={{ fill: chart.tick, fontSize: 11 }}
                     tickLine={false}
                     axisLine={false}
                     allowDecimals={false}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0f172a",
-                      border: "1px solid #1e293b",
-                      borderRadius: "8px",
-                      color: "#e2e8f0",
-                    }}
+                    contentStyle={chart.tooltip}
                     labelFormatter={(label) => `Fecha: ${label}`}
                     formatter={(value: number) => [value, "Prescripciones"]}
                   />
@@ -277,17 +274,12 @@ export default function AdminDashboardPage() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0f172a",
-                      border: "1px solid #1e293b",
-                      borderRadius: "8px",
-                      color: "#e2e8f0",
-                    }}
+                    contentStyle={chart.tooltip}
                     formatter={(value: number, name: string): [number, string] => [value, name]}
                   />
                   <Legend
                     formatter={(value: string) => (
-                      <span style={{ color: "#94a3b8", fontSize: 12 }}>
+                      <span style={{ color: chart.legend, fontSize: 12 }}>
                         {value}
                       </span>
                     )}
@@ -304,7 +296,7 @@ export default function AdminDashboardPage() {
       {/* Top doctors table */}
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <div className="border-b border-slate-800 px-5 py-4">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-900 dark:text-slate-100">
             Top médicos por volumen
             {metrics && (
               <span className="ml-2 rounded-full bg-indigo-600/20 px-2 py-0.5 text-xs font-semibold text-indigo-400">
@@ -479,7 +471,7 @@ function SummaryCard({
         <div className={c.icon}>{icon}</div>
       </div>
       <div>
-        <p className="text-sm text-slate-400">{label}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
         <p className={`mt-0.5 text-3xl font-bold ${c.value}`}>
           {value.toLocaleString("es-ES")}
         </p>
@@ -509,7 +501,7 @@ function ChartCard({
 }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5">
-      <h2 className="mb-4 text-sm font-semibold text-slate-300">{title}</h2>
+      <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-300">{title}</h2>
       {children}
     </div>
   );
@@ -531,7 +523,7 @@ function RankBadge({ rank }: { rank: number }) {
         ? "bg-slate-400/20 text-slate-300"
         : rank === 3
           ? "bg-orange-700/20 text-orange-500"
-          : "bg-slate-800 text-slate-500";
+          : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-500";
   return (
     <span
       className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${colors}`}

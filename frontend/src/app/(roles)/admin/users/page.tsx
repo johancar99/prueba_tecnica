@@ -124,7 +124,7 @@ export default function AdminUsersPage() {
       {/* Page header */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-slate-100">
             Gestión de Usuarios
           </h1>
           <p className="mt-1 text-sm text-slate-400">
@@ -157,7 +157,7 @@ export default function AdminUsersPage() {
               const timer = setTimeout(() => handleSearch(val), 400);
               return () => clearTimeout(timer);
             }}
-            className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 py-2.5 pl-9 pr-4 text-sm text-slate-100 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="w-full rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 py-2.5 pl-9 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
           />
         </div>
 
@@ -165,10 +165,10 @@ export default function AdminUsersPage() {
         <select
           value={currentRole}
           onChange={(e) => handleRoleFilter(e.target.value as BackendRole | "")}
-          className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:w-48"
+          className="rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-800/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:w-48"
         >
           {ROLE_FILTER_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-slate-800">
+            <option key={opt.value} value={opt.value} className="bg-white dark:bg-slate-800">
               {opt.label}
             </option>
           ))}
@@ -247,7 +247,7 @@ function UserRow({ user }: { user: UserRecord }) {
       : "—";
 
   return (
-    <tr className="border-b border-slate-100 dark:border-slate-800/50 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/30">
+    <tr className="border-b border-slate-100 dark:border-slate-800/50 transition-colors hover:bg-slate-50 dark:hover:bg-slate-50 dark:hover:bg-slate-800/30">
       {/* Name + avatar */}
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
