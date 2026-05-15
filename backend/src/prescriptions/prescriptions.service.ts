@@ -1,12 +1,14 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from "@nestjs/common";
 import { v4 as uuidv4 } from "uuid";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { PdfService, PrescriptionPdfData } from "../pdf/pdf.service";
+import { MailService } from "../mail/mail.service";
 import { Role } from "../common/enums/role.enum";
 import {
   buildPaginatedResponse,
@@ -58,11 +60,18 @@ interface RequestUser {
   role: Role;
 }
 
+type PrescriptionWithRelations = Prisma.PrescriptionGetPayload<{
+  select: typeof PRESCRIPTION_SELECT;
+}>;
+
 @Injectable()
 export class PrescriptionsService {
+  private readonly logger = new Logger(PrescriptionsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly pdfService: PdfService,
+    private readonly mailService: MailService,
   ) {}
 
   // ---------------------------------------------------------------------------
@@ -107,6 +116,8 @@ export class PrescriptionsService {
         select: PRESCRIPTION_SELECT,
       });
     });
+
+    this.dispatchPrescriptionCreatedEmail(prescription);
 
     return prescription;
   }
@@ -311,6 +322,26 @@ export class PrescriptionsService {
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
+
+  private dispatchPrescriptionCreatedEmail(prescription: PrescriptionWithRelations): void {
+    void (async () => {
+      try {
+        await this.mailService.sendPrescriptionCreated({
+          to: prescription.patient.user.email,
+          patientName: prescription.patient.user.name,
+          doctorName: prescription.author.user.name,
+          prescriptionCode: prescription.code,
+          prescriptionId: prescription.id,
+          items: prescription.items,
+        });
+      } catch (error) {
+        this.logger.error(
+          `Error al enviar notificación por email para prescripción ${prescription.id}`,
+          error instanceof Error ? error.stack : error,
+        );
+      }
+    })();
+  }
 
   private generateCode(): string {
     const date = new Date();

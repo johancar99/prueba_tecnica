@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -11,6 +11,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 import { AdminService } from './admin.service';
+import { QueryMetricsDto } from './dto/query-metrics.dto';
 
 @ApiTags('Admin')
 @ApiBearerAuth('access-token')
@@ -59,7 +60,7 @@ export class AdminController {
     },
   })
   @ApiForbiddenResponse({ description: 'Acceso denegado — se requiere rol ADMIN' })
-  getMetrics() {
-    return this.adminService.getMetrics();
+  getMetrics(@Query() query: QueryMetricsDto) {
+    return this.adminService.getMetrics(query);
   }
 }

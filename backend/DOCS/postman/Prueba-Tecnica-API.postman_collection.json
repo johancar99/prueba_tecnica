@@ -1,0 +1,616 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Prueba Técnica — API Prescripciones Médicas",
+    "description": "Colección completa de la API NestJS (prefijo global `/api`).\n\n## Cuentas de prueba (seed)\n| Rol | Email | Contraseña |\n|-----|-------|------------|\n| Admin | admin@clinica.com | Admin123! |\n| Doctor | doctor@clinica.com | Doctor123! |\n| Paciente | paciente@clinica.com | Patient123! |\n\n## Uso rápido\n1. Importa esta colección y el entorno `Prueba-Tecnica-Local.postman_environment.json`.\n2. Ejecuta **Auth → Login (Admin/Doctor/Patient)** según el rol que necesites.\n3. Los tokens se guardan automáticamente en `accessToken` y `refreshToken`.\n4. Las peticiones protegidas usan Bearer `{{accessToken}}`.\n\n## Respuestas\nTodas las respuestas exitosas pasan por el interceptor:\n```json\n{ \"statusCode\": 200, \"message\": \"OK\", \"data\": { ... } }\n```\nListados paginados incluyen además `meta`.\n\nSwagger: http://localhost:3001/api/docs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001/api", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "refreshToken", "value": "", "type": "string" },
+    { "key": "userId", "value": "", "type": "string" },
+    { "key": "patientProfileId", "value": "", "type": "string" },
+    { "key": "prescriptionId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Autenticación JWT. Login, registro, refresh, logout y perfil.",
+      "item": [
+        {
+          "name": "Login — Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const data = body.data || body;",
+                  "  pm.collectionVariables.set('accessToken', data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', data.refreshToken);",
+                  "  pm.test('Tokens guardados', () => {",
+                  "    pm.expect(data.accessToken).to.be.a('string').and.not.empty;",
+                  "  });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@clinica.com\",\n  \"password\": \"Admin123!\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Inicia sesión como administrador."
+          }
+        },
+        {
+          "name": "Login — Doctor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const data = body.data || body;",
+                  "  pm.collectionVariables.set('accessToken', data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doctor@clinica.com\",\n  \"password\": \"Doctor123!\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Inicia sesión como médico."
+          }
+        },
+        {
+          "name": "Login — Paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const data = body.data || body;",
+                  "  pm.collectionVariables.set('accessToken', data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"paciente@clinica.com\",\n  \"password\": \"Patient123!\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Inicia sesión como paciente."
+          }
+        },
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  const data = body.data || body;",
+                  "  if (data.accessToken) pm.collectionVariables.set('accessToken', data.accessToken);",
+                  "  if (data.refreshToken) pm.collectionVariables.set('refreshToken', data.refreshToken);",
+                  "  if (data.user?.id) pm.collectionVariables.set('userId', data.user.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nuevo.paciente@clinica.com\",\n  \"password\": \"Passw0rd!\",\n  \"name\": \"Nuevo Paciente\",\n  \"role\": \"PATIENT\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register",
+            "description": "Registra un usuario (PATIENT o DOCTOR). Público."
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const data = body.data || body;",
+                  "  pm.collectionVariables.set('accessToken', data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/refresh",
+            "description": "Renueva access y refresh token. El refreshToken va en el body."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/logout",
+            "description": "Invalida el refresh token del usuario autenticado."
+          }
+        },
+        {
+          "name": "Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const data = body.data || body;",
+                  "  if (data.id) pm.collectionVariables.set('userId', data.id);",
+                  "  if (data.patient?.id) pm.collectionVariables.set('patientProfileId', data.patient.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auth/profile",
+            "description": "Perfil del usuario autenticado (incluye doctor/patient si aplica)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "Gestión de usuarios. Requiere rol **ADMIN**.",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "role", "value": "DOCTOR", "disabled": true },
+                { "key": "search", "value": "juan", "disabled": true }
+              ]
+            },
+            "description": "Lista paginada. Filtros opcionales: role, search."
+          }
+        },
+        {
+          "name": "Listar médicos (users/doctors)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/doctors?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "doctors"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar pacientes (users/patients)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const list = body.data;",
+                  "  if (Array.isArray(list) && list[0]?.id) {",
+                  "    pm.collectionVariables.set('patientProfileId', list[0].id);",
+                  "    if (list[0].user?.id) pm.collectionVariables.set('userId', list[0].user.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/patients?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "patients"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener usuario por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/{{userId}}",
+            "description": "Reemplaza {{userId}} con el ID del usuario."
+          }
+        },
+        {
+          "name": "Crear usuario (Doctor)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  const data = body.data || body;",
+                  "  if (data.id) pm.collectionVariables.set('userId', data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doctor.nuevo@clinica.com\",\n  \"password\": \"Passw0rd!\",\n  \"name\": \"Dr. Nuevo Médico\",\n  \"role\": \"DOCTOR\",\n  \"licenseNumber\": \"LIC-99999\",\n  \"specialty\": \"Pediatría\"\n}"
+            },
+            "url": "{{baseUrl}}/users",
+            "description": "Crea usuario DOCTOR. licenseNumber es obligatorio para médicos."
+          }
+        },
+        {
+          "name": "Crear usuario (Paciente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  const data = body.data || body;",
+                  "  if (data.id) pm.collectionVariables.set('userId', data.id);",
+                  "  if (data.patient?.id) pm.collectionVariables.set('patientProfileId', data.patient.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"paciente.nuevo@clinica.com\",\n  \"password\": \"Passw0rd!\",\n  \"name\": \"Paciente Nuevo\",\n  \"role\": \"PATIENT\",\n  \"birthDate\": \"1995-08-20\",\n  \"phone\": \"+34 600 999 888\",\n  \"address\": \"Calle Ejemplo 10, Madrid\"\n}"
+            },
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nombre Actualizado\",\n  \"specialty\": \"Medicina Interna\"\n}"
+            },
+            "url": "{{baseUrl}}/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/users/{{userId}}",
+            "description": "Respuesta 204 No Content."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctors",
+      "description": "Listado de médicos. Requiere rol **ADMIN**.",
+      "item": [
+        {
+          "name": "Listar médicos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/doctors?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctors"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patients",
+      "description": "Listado de pacientes. Requiere rol **ADMIN** o **DOCTOR**.",
+      "item": [
+        {
+          "name": "Listar pacientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const list = body.data;",
+                  "  if (Array.isArray(list) && list[0]?.id) {",
+                  "    pm.collectionVariables.set('patientProfileId', list[0].id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "search", "value": "maria", "disabled": true }
+              ]
+            },
+            "description": "Usar como doctor antes de crear prescripción para obtener patientProfileId."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prescriptions",
+      "description": "Prescripciones médicas. Roles según endpoint.",
+      "item": [
+        {
+          "name": "Crear prescripción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  const data = body.data || body;",
+                  "  if (data.id) pm.collectionVariables.set('prescriptionId', data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientProfileId}}\",\n  \"notes\": \"Paciente hipertenso. Evitar AINES prolongados.\",\n  \"items\": [\n    {\n      \"medication\": \"Ibuprofeno 400mg\",\n      \"dosage\": \"400mg\",\n      \"frequency\": \"Cada 8 horas\",\n      \"duration\": \"7 días\",\n      \"instructions\": \"Tomar con alimentos\"\n    },\n    {\n      \"medication\": \"Omeprazol 20mg\",\n      \"dosage\": \"20mg\",\n      \"frequency\": \"Una vez al día\",\n      \"duration\": \"7 días\",\n      \"instructions\": \"En ayunas\"\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/prescriptions",
+            "description": "Solo **DOCTOR**. Dispara notificación por email al paciente (async). Ejecutar Login Doctor + Listar pacientes antes."
+          }
+        },
+        {
+          "name": "Listar prescripciones (Doctor/Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const list = body.data;",
+                  "  if (Array.isArray(list) && list[0]?.id) {",
+                  "    pm.collectionVariables.set('prescriptionId', list[0].id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "pending", "disabled": true },
+                { "key": "from", "value": "2026-01-01", "disabled": true },
+                { "key": "to", "value": "2026-12-31", "disabled": true }
+              ]
+            },
+            "description": "DOCTOR ve solo las suyas. ADMIN ve todas."
+          }
+        },
+        {
+          "name": "Mis prescripciones (Paciente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const list = body.data;",
+                  "  if (Array.isArray(list) && list[0]?.id) {",
+                  "    pm.collectionVariables.set('prescriptionId', list[0].id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/me?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "me"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "pending", "disabled": true }
+              ]
+            },
+            "description": "Solo **PATIENT**."
+          }
+        },
+        {
+          "name": "Obtener prescripción por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/prescriptions/{{prescriptionId}}",
+            "description": "DOCTOR/PATIENT solo las propias. ADMIN todas."
+          }
+        },
+        {
+          "name": "Consumir prescripción (Paciente)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"consumed\"\n}"
+            },
+            "url": "{{baseUrl}}/prescriptions/{{prescriptionId}}/consume",
+            "description": "Solo **PATIENT**, solo estado `pending`. Valores: consumed, completed, cancelled."
+          }
+        },
+        {
+          "name": "Descargar PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/prescriptions/{{prescriptionId}}/pdf",
+            "description": "Devuelve application/pdf. En Postman usar **Send and Download**."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "description": "Panel administrativo. Requiere rol **ADMIN**.",
+      "item": [
+        {
+          "name": "Métricas del panel",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "metrics"],
+              "query": [
+                { "key": "from", "value": "2026-01-01", "disabled": true },
+                { "key": "to", "value": "2026-12-31", "disabled": true }
+              ]
+            },
+            "description": "Totales, distribución por estado, serie por día y top médicos."
+          }
+        }
+      ]
+    }
+  ]
+}

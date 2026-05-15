@@ -9,21 +9,21 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
-import { PaginationDto } from '../common/dto/pagination.dto';
 import { UsersService } from '../users/users.service';
+import { QueryPatientsDto } from './dto/query-patients.dto';
 
 @ApiTags('Patients')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
+@Roles(Role.ADMIN, Role.DOCTOR)
 @Controller('patients')
 export class PatientsController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
   @ApiOperation({
-    summary: '[ADMIN] Listar pacientes',
-    description: 'Retorna todos los perfiles de pacientes con datos de usuario, paginados.',
+    summary: '[ADMIN/DOCTOR] Listar pacientes',
+    description: 'Retorna todos los perfiles de pacientes con datos de usuario, paginados. Los médicos pueden usar este endpoint para buscar pacientes al crear prescripciones.',
   })
   @ApiOkResponse({
     description: 'Lista paginada de pacientes',
@@ -58,7 +58,7 @@ export class PatientsController {
       },
     },
   })
-  findAll(@Query() pagination: PaginationDto) {
-    return this.usersService.findPatients(pagination);
+  findAll(@Query() query: QueryPatientsDto) {
+    return this.usersService.findPatients(query);
   }
 }

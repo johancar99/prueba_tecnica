@@ -99,7 +99,7 @@ export class UsersController {
     description: 'Retorna todos los perfiles de pacientes con datos de usuario, paginados.',
   })
   @ApiOkResponse({ description: 'Lista paginada de pacientes' })
-  findPatients(@Query() pagination: PaginationDto) {
+  findPatients(@Query() pagination: PaginationDto & { search?: string }) {
     return this.usersService.findPatients(pagination);
   }
 

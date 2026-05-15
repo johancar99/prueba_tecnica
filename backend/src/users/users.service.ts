@@ -215,14 +215,28 @@ export class UsersService {
   }
 
   // ---------------------------------------------------------------------------
-  // GET /patients  (listado paginado con perfil)
+  // GET /patients  (listado paginado con perfil + búsqueda opcional)
   // ---------------------------------------------------------------------------
-  async findPatients(pagination: PaginationDto): Promise<PaginatedResponse<unknown>> {
-    const { page = 1, limit = 10 } = pagination;
+  async findPatients(
+    pagination: PaginationDto & { search?: string },
+  ): Promise<PaginatedResponse<unknown>> {
+    const { page = 1, limit = 10, search } = pagination;
     const skip = (page - 1) * limit;
+
+    const where: Prisma.PatientWhereInput = search
+      ? {
+          user: {
+            OR: [
+              { name: { contains: search, mode: 'insensitive' } },
+              { email: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+        }
+      : {};
 
     const [patients, total] = await Promise.all([
       this.prisma.patient.findMany({
+        where,
         include: {
           user: {
             select: { id: true, email: true, name: true, role: true, createdAt: true },
@@ -232,7 +246,7 @@ export class UsersService {
         skip,
         take: limit,
       }),
-      this.prisma.patient.count(),
+      this.prisma.patient.count({ where }),
     ]);
 
     return buildPaginatedResponse(patients, total, page, limit);

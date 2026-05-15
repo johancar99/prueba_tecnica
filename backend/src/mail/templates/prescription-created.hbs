@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nueva prescripción médica</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #1f2937; background: #f3f4f6; margin: 0; padding: 24px; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .header { background: #2563eb; color: #ffffff; padding: 24px; }
+    .content { padding: 24px; }
+    .item { border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 16px; margin-bottom: 12px; }
+    .item strong { display: block; margin-bottom: 4px; color: #111827; }
+    .meta { color: #6b7280; font-size: 14px; }
+    .btn { display: inline-block; margin-top: 20px; padding: 12px 20px; background: #2563eb; color: #ffffff !important; text-decoration: none; border-radius: 6px; font-weight: 600; }
+    .footer { padding: 16px 24px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin:0;font-size:22px;">Nueva prescripción médica</h1>
+    </div>
+    <div class="content">
+      <p>Hola <strong>{{patientName}}</strong>,</p>
+      <p>
+        El médico <strong>{{doctorName}}</strong> ha registrado una nueva prescripción
+        con código <strong>{{prescriptionCode}}</strong>.
+      </p>
+
+      <h2 style="font-size:16px;margin-top:24px;">Medicamentos recetados</h2>
+      {{#each items}}
+      <div class="item">
+        <strong>{{this.medication}}</strong>
+        <div class="meta">Dosis: {{this.dosage}} · Frecuencia: {{this.frequency}} · Duración: {{this.duration}}</div>
+        {{#if this.instructions}}
+        <div class="meta" style="margin-top:6px;">Indicaciones: {{this.instructions}}</div>
+        {{/if}}
+      </div>
+      {{/each}}
+
+      {{#if detailUrl}}
+      <a href="{{detailUrl}}" class="btn">Ver detalle en el portal</a>
+      {{/if}}
+    </div>
+    <div class="footer">
+      Este es un mensaje automático. No respondas a este correo.
+    </div>
+  </div>
+</body>
+</html>

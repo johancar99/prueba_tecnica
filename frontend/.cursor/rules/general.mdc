@@ -1,0 +1,39 @@
+---
+alwaysApply: true
+---
+
+# Reglas de Arquitectura y Desarrollo - Frontend (Next.js App Router)
+
+Eres un experto en Frontend Senior especializado en Next.js, TypeScript y TailwindCSS. Tu objetivo es construir la interfaz del sistema de prescripciones siguiendo estos lineamientos:
+
+### 1. Organización del Proyecto y Rutas
+- **App Router:** Utiliza estrictamente la estructura de `src/app/`. [cite_start]Usa Route Groups (ej: `(auth)`, `(roles)`) para separar la lógica de autenticación de las vistas protegidas [cite: 283-292].
+- **Nombramiento:** - Componentes: `PascalCase`.
+  - Funciones y variables: `camelCase`.
+  - Archivos de rutas: `page.tsx`, `layout.tsx`, `loading.tsx`.
+
+### 2. Estado Global y Datos
+- [cite_start]**Manejo de Estado:** Utiliza Zustand para gestionar la sesión del usuario (tokens y perfil) y preferencias simples[cite: 295].
+- **Consumo de API:** Centraliza todas las peticiones en `src/lib/fetcher.ts`. 
+  - Implementa interceptores para adjuntar el Bearer Token automáticamente.
+  - [cite_start]Implementa la lógica de renovación automática usando el Refresh Token si el Access Token expira [cite: 36-37].
+
+### 3. Seguridad y RBAC (Frontend)
+- [cite_start]**Protección de Rutas:** Implementa un Middleware de Next.js o HOCs (Higher-Order Components) para validar el rol del usuario antes de permitir el acceso a `/doctor`, `/patient` o `/admin` [cite: 38-39, 224].
+- [cite_start]**Persistencia:** Almacena los tokens de forma segura (HTTP-Only cookies es preferible para el Refresh Token si el backend lo permite, o almacenamiento local seguro para el Access Token) [cite: 36-37].
+
+### 4. UI/UX y Estilos
+- **TailwindCSS:** Úsalo para todo el estilizado. [cite_start]Mantén la interfaz limpia, profesional y **completamente responsive**[cite: 6, 223].
+- **Feedback al Usuario:** - Usa esqueletos (`loading.tsx`) para estados de carga.
+  - [cite_start]Implementa Toasts para confirmar acciones (ej: "Prescripción creada", "Error al iniciar sesión")[cite: 223].
+  - Gestiona estados vacíos (empty states) en las tablas de listados.
+- [cite_start]**Persistencia de Filtros:** Los filtros de búsqueda y paginación deben persistir en la URL (`querystring`) para permitir compartir enlaces o recargar la página sin perder el estado[cite: 225].
+
+### 5. Componentes y Formularios
+- **Formularios:** Usa `react-hook-form` con validaciones (Zod o similar). 
+- [cite_start]**Formulario de Prescripción:** El formulario del médico debe permitir agregar y eliminar ítems de forma dinámica (inputs libres)[cite: 209].
+- [cite_start]**Dashboard:** Para `/admin`, utiliza `Recharts` o `Chart.js` para visualizar las métricas obtenidas del backend [cite: 215-220].
+
+### 6. Calidad de Código
+- **TypeScript:** Tipado estricto en todo momento. Prohibido el uso de `any`.
+- **Modularidad:** Separa los componentes grandes en piezas pequeñas y reutilizables dentro de `src/components/`.

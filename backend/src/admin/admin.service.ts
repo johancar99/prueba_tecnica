@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrescriptionStatus } from '@prisma/client';
+import { PrescriptionStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { QueryMetricsDto } from './dto/query-metrics.dto';
 
 interface DayRow {
   day: Date;
@@ -11,40 +12,92 @@ interface DayRow {
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getMetrics() {
+  async getMetrics(query: QueryMetricsDto = {}) {
+    const { from, to } = query;
+    const prescriptionDateFilter = this.buildCreatedAtFilter(from, to);
+    const doctorDateFilter = this.buildCreatedAtFilter(from, to);
+    const patientDateFilter = this.buildCreatedAtFilter(from, to);
+    const seriesBounds = this.resolveSeriesBounds(from, to);
+
     const [totals, statusGroups, rawByDay, topDoctorsRaw] = await Promise.all([
-      this.getTotals(),
-      this.getByStatus(),
-      this.getRawByDay(),
-      this.getTopDoctors(),
+      this.getTotals(prescriptionDateFilter, doctorDateFilter, patientDateFilter),
+      this.getByStatus(prescriptionDateFilter),
+      this.getRawByDay(seriesBounds.start, seriesBounds.end),
+      this.getTopDoctors(prescriptionDateFilter),
     ]);
 
     return {
       totals,
       byStatus: this.buildStatusMap(statusGroups),
-      byDay: this.buildDaySeries(rawByDay),
+      byDay: this.buildDaySeries(rawByDay, seriesBounds.start, seriesBounds.end),
       topDoctors: topDoctorsRaw,
     };
   }
 
   // ---------------------------------------------------------------------------
-  // Totals — parallel counts
+  // Date helpers
   // ---------------------------------------------------------------------------
-  private async getTotals() {
+  private buildCreatedAtFilter(
+    from?: string,
+    to?: string,
+  ): Prisma.DateTimeFilter | undefined {
+    if (!from && !to) return undefined;
+    return {
+      ...(from && { gte: new Date(from) }),
+      ...(to && { lte: new Date(`${to}T23:59:59.999Z`) }),
+    };
+  }
+
+  private resolveSeriesBounds(from?: string, to?: string): { start: Date; end: Date } {
+    const end = to
+      ? new Date(`${to}T23:59:59.999Z`)
+      : (() => {
+          const d = new Date();
+          d.setUTCHours(23, 59, 59, 999);
+          return d;
+        })();
+
+    const start = from
+      ? new Date(from)
+      : (() => {
+          const s = new Date(end);
+          s.setUTCHours(0, 0, 0, 0);
+          s.setUTCDate(s.getUTCDate() - 29);
+          return s;
+        })();
+
+    return { start, end };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Totals
+  // ---------------------------------------------------------------------------
+  private async getTotals(
+    prescriptionFilter?: Prisma.DateTimeFilter,
+    doctorFilter?: Prisma.DateTimeFilter,
+    patientFilter?: Prisma.DateTimeFilter,
+  ) {
     const [doctors, patients, prescriptions] = await Promise.all([
-      this.prisma.doctor.count(),
-      this.prisma.patient.count(),
-      this.prisma.prescription.count(),
+      this.prisma.doctor.count({
+        where: doctorFilter ? { createdAt: doctorFilter } : undefined,
+      }),
+      this.prisma.patient.count({
+        where: patientFilter ? { createdAt: patientFilter } : undefined,
+      }),
+      this.prisma.prescription.count({
+        where: prescriptionFilter ? { createdAt: prescriptionFilter } : undefined,
+      }),
     ]);
     return { doctors, patients, prescriptions };
   }
 
   // ---------------------------------------------------------------------------
-  // By status — single groupBy query
+  // By status
   // ---------------------------------------------------------------------------
-  private getByStatus() {
+  private getByStatus(prescriptionFilter?: Prisma.DateTimeFilter) {
     return this.prisma.prescription.groupBy({
       by: ['status'],
+      where: prescriptionFilter ? { createdAt: prescriptionFilter } : undefined,
       _count: { _all: true },
     });
   }
@@ -65,68 +118,96 @@ export class AdminService {
   }
 
   // ---------------------------------------------------------------------------
-  // Time series — last 30 days, one row per calendar day (UTC)
-  // Raw SQL needed because Prisma groupBy does not support date truncation.
+  // Time series
   // ---------------------------------------------------------------------------
-  private getRawByDay(): Promise<DayRow[]> {
+  private getRawByDay(start: Date, end: Date): Promise<DayRow[]> {
     return this.prisma.$queryRaw<DayRow[]>`
       SELECT
         DATE_TRUNC('day', "createdAt") AS day,
         COUNT(*)::bigint               AS count
       FROM prescriptions
-      WHERE "createdAt" >= NOW() - INTERVAL '30 days'
+      WHERE "createdAt" >= ${start}
+        AND "createdAt" <= ${end}
       GROUP BY day
       ORDER BY day ASC
     `;
   }
 
-  private buildDaySeries(rows: DayRow[]): Array<{ date: string; count: number }> {
-    // Build a lookup: "YYYY-MM-DD" → count
+  private buildDaySeries(
+    rows: DayRow[],
+    start: Date,
+    end: Date,
+  ): Array<{ date: string; count: number }> {
     const lookup = new Map<string, number>();
     for (const row of rows) {
       const key = row.day.toISOString().slice(0, 10);
       lookup.set(key, Number(row.count));
     }
 
-    // Generate all 30 days (today inclusive) and fill gaps with 0
     const series: Array<{ date: string; count: number }> = [];
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date();
-      d.setUTCHours(0, 0, 0, 0);
-      d.setUTCDate(d.getUTCDate() - i);
-      const key = d.toISOString().slice(0, 10);
+    const cursor = new Date(start);
+    cursor.setUTCHours(0, 0, 0, 0);
+    const endDay = new Date(end);
+    endDay.setUTCHours(0, 0, 0, 0);
+
+    while (cursor <= endDay) {
+      const key = cursor.toISOString().slice(0, 10);
       series.push({ date: key, count: lookup.get(key) ?? 0 });
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
     }
+
     return series;
   }
 
   // ---------------------------------------------------------------------------
-  // Top doctors — Prisma relation-count orderBy (no raw SQL needed)
+  // Top doctors (prescription count within date range)
   // ---------------------------------------------------------------------------
-  private async getTopDoctors(take = 10) {
+  private async getTopDoctors(
+    prescriptionFilter?: Prisma.DateTimeFilter,
+    take = 10,
+  ) {
+    const where = prescriptionFilter
+      ? { createdAt: prescriptionFilter }
+      : undefined;
+
+    const groups = (
+      await this.prisma.prescription.groupBy({
+        by: ["authorId"],
+        where,
+        _count: { _all: true },
+      })
+    )
+      .sort((a, b) => b._count._all - a._count._all)
+      .slice(0, take);
+
+    if (groups.length === 0) return [];
+
+    const doctorIds = groups.map((g) => g.authorId);
     const doctors = await this.prisma.doctor.findMany({
-      take,
-      orderBy: { prescriptions: { _count: 'desc' } },
+      where: { id: { in: doctorIds } },
       select: {
         id: true,
         licenseNumber: true,
         specialty: true,
-        user: {
-          select: { name: true, email: true },
-        },
-        _count: {
-          select: { prescriptions: true },
-        },
+        user: { select: { name: true, email: true } },
       },
     });
 
-    return doctors.map((d) => ({
-      doctorId: d.id,
-      licenseNumber: d.licenseNumber,
-      specialty: d.specialty,
-      name: d.user.name,
-      email: d.user.email,
-      prescriptionsCount: d._count.prescriptions,
-    }));
+    const doctorMap = new Map(doctors.map((d) => [d.id, d]));
+
+    return groups
+      .map((g) => {
+        const d = doctorMap.get(g.authorId);
+        if (!d) return null;
+        return {
+          doctorId: d.id,
+          licenseNumber: d.licenseNumber,
+          specialty: d.specialty,
+          name: d.user.name,
+          email: d.user.email,
+          prescriptionsCount: g._count._all,
+        };
+      })
+      .filter((d): d is NonNullable<typeof d> => d !== null);
   }
 }
