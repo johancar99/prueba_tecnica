@@ -11,6 +11,7 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Pagination from "@/components/ui/Pagination";
 import { SkeletonTableRow } from "@/components/ui/Skeleton";
+import SearchParamsBoundary from "@/components/common/SearchParamsBoundary";
 
 const PAGE_SIZE = 10;
 
@@ -32,7 +33,7 @@ const STATUS_BADGE: Record<
   cancelled: { variant: "danger", label: "Cancelada" },
 };
 
-export default function DoctorPrescriptionsPage() {
+function DoctorPrescriptionsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -215,6 +216,14 @@ export default function DoctorPrescriptionsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function DoctorPrescriptionsPage() {
+  return (
+    <SearchParamsBoundary>
+      <DoctorPrescriptionsContent />
+    </SearchParamsBoundary>
   );
 }
 

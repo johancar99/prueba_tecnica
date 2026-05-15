@@ -102,6 +102,7 @@ export default function LoginPage() {
 
           {/* Form */}
           <form
+            method="post"
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-5"
             noValidate

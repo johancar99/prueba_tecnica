@@ -11,6 +11,7 @@ import Button from "@/components/ui/Button";
 import Pagination from "@/components/ui/Pagination";
 import { SkeletonTableRow } from "@/components/ui/Skeleton";
 import UserCreateModal from "@/components/admin/UserCreateModal";
+import SearchParamsBoundary from "@/components/common/SearchParamsBoundary";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -31,7 +32,7 @@ const ROLE_FILTER_OPTIONS: { value: BackendRole | ""; label: string }[] = [
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function AdminUsersPage() {
+function AdminUsersContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -233,6 +234,14 @@ export default function AdminUsersPage() {
         onSuccess={handleUserCreated}
       />
     </div>
+  );
+}
+
+export default function AdminUsersPage() {
+  return (
+    <SearchParamsBoundary>
+      <AdminUsersContent />
+    </SearchParamsBoundary>
   );
 }
 

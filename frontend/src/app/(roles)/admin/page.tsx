@@ -19,6 +19,7 @@ import {
 import { fetcher, ApiError } from "@/lib/fetcher";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useChartTheme } from "@/hooks/useChartTheme";
+import SearchParamsBoundary from "@/components/common/SearchParamsBoundary";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ function formatShortDate(iso: string) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function AdminDashboardPage() {
+function AdminDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -428,6 +429,14 @@ export default function AdminDashboardPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminDashboardPage() {
+  return (
+    <SearchParamsBoundary>
+      <AdminDashboardContent />
+    </SearchParamsBoundary>
   );
 }
 

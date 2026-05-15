@@ -15,7 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className="min-h-screen bg-slate-100 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+      <body
+        className="min-h-screen bg-slate-100 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100"
+        suppressHydrationWarning
+      >
         <ThemeProvider>
           {children}
           <ToastProvider />

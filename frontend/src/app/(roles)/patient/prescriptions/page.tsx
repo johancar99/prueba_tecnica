@@ -11,6 +11,7 @@ import type { PaginatedResponse } from "@/types/users";
 import Badge from "@/components/ui/Badge";
 import Pagination from "@/components/ui/Pagination";
 import { Skeleton } from "@/components/ui/Skeleton";
+import SearchParamsBoundary from "@/components/common/SearchParamsBoundary";
 
 const PAGE_SIZE = 9;
 
@@ -43,7 +44,7 @@ function formatDate(iso: string) {
   }).format(new Date(iso));
 }
 
-export default function PatientPrescriptionsPage() {
+function PatientPrescriptionsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -230,6 +231,14 @@ export default function PatientPrescriptionsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function PatientPrescriptionsPage() {
+  return (
+    <SearchParamsBoundary>
+      <PatientPrescriptionsContent />
+    </SearchParamsBoundary>
   );
 }
 
